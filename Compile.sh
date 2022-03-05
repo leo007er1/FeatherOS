@@ -1,3 +1,9 @@
+#! /bin/bash
+
+# Checks if the directory CompiledFiles exists
+if [ ! -d "$CompiledFiles" ]; then
+    mkdir "CompiledFiles"
+fi
 
 # Cagos compilation
 nasm "Cagos/CagosMain.asm" -f bin -o "CompiledFiles/Cagos.bin"
