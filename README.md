@@ -15,5 +15,5 @@ In this repository there's included the RunOS.sh bash script, that let's you run
 ```
 Or in alternative just run this command:
 ```
-qemu-system-x86_64 FileCompilati/boot.bin
+qemu-system-x86_64 CompiledFiles/boot.bin
 ```
