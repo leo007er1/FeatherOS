@@ -7,15 +7,15 @@ LD := ld
 
 # All the flags for linker and compiler
 CFlags ?= -Wall -Wextra -std=gnu11 -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -fno-PIE -fno-PIC \
-	-m64 -march=x86-64 -mabi=sysv -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone -mcmodel=kernel
+	-m64 -march=x86-64 -mabi=sysv -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone -mcmodel=kernel -I Kernel/Include/
 
 NasmFlags ?= -F dwarf -g
-LdFLags ?= -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -no-pie -T Kernel/Linker.ld
+LdFlags ?= -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -no-pie -T Kernel/Linker.ld
 
 # Finds all .c and .asm files and gets the .o file names
 CFiles := $(shell find -L Kernel/ -type f -name '*.c')
-# NasmFiles := $(shell find -L Kernel/ -type f -name '*.asm')
-Obj := $(patsubst %.c, %.o, $(CFiles))
+NasmFiles := $(shell find -L Kernel/ -type f -name '*.asm')
+Obj := $(addprefix $(BuildDir)/, $(patsubst %.c, %.o, $(CFiles)) $(patsubst %.asm, %.o, $(NasmFiles)))
 
 
 .PHONY: all compile
@@ -28,10 +28,11 @@ $(KernelName): $(Obj)
 	$(LD) $(Obj) $(LdFlags) -o $(BuildDir)/$@
 
 
-%.o: %.c
-	@$(CC) $(CFlags) -c $< -o $@
+$(addprefix $(BuildDir)/, %.o): %.c
+	$(CC) $(CFlags) -c $< -o $@
 
-%.o: %.asm
+
+$(addprefix $(BuildDir)/, %.o): %.asm
 	nasm -f elf64 $< -o $@
 
 
@@ -40,7 +41,7 @@ BuildIso:
 
 	@sudo rm -rf $(BuildDir)/IsoRoot/*
 	@mkdir -p $(BuildDir)/IsoRoot
-	@sudo cp -v $(BuildDir)/Kernel.elf Limine.cfg limine/limine.sys limine/limine-cd.bin limine/limine-cd-efi.bin $(BuildDir)/IsoRoot
+	@sudo cp -v $(BuildDir)/Kernel.elf Limine.cfg limine/limine.sys limine/limine-cd.bin limine/limine-cd-efi.bin 12.jpeg $(BuildDir)/IsoRoot
 
 	xorriso -as mkisofs -b limine-cd.bin \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
@@ -63,7 +64,7 @@ limine.h:
 	fi
 
 	@echo -e "\n\e[0;32m==> Compiling Kernel...\e[0m"
-	@echo $(CFiles) $(Obj)
+	
 
 
 # Checks if the user has permissions to create the image
@@ -74,10 +75,12 @@ CheckUser:
 	fi
 
 
-.PHONY: run
+.PHONY: run debug
 run:
 	@qemu-system-x86_64 -hda $(BuildDir)/$(IsoName) -d int
 
+debug:
+	@qemu-system-x86_64 -hda $(BuildDir)/$(IsoName) -d int -monitor stdio 
 
 .PHONY: clean
 clean:
