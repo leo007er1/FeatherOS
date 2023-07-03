@@ -2,7 +2,7 @@
 
 
 typedef struct {
-    uint16_t limit0; // Size of segment
+    uint16_t limit0;
     uint16_t base0;
     uint8_t base1;
     uint8_t access; // Type field, Descriptor type, DPL and Segment present

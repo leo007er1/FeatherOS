@@ -1,9 +1,9 @@
 
-IsoName := FeatherOS.iso
-BuildDir := Build
-KernelName := Kernel.elf
-CC := gcc
-LD := ld
+override IsoName := FeatherOS.iso
+override BuildDir := Build/
+override KernelName := Kernel.elf
+override CC := gcc
+override LD := ld
 
 # All the flags for linker and compiler
 CFlags ?= -Wall -Wextra -std=gnu11 -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -fno-PIE -fno-PIC \
@@ -15,41 +15,45 @@ LdFlags ?= -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -no-pie -T Ke
 # Finds all .c and .asm files and gets the .o file names
 CFiles := $(shell find -L Kernel/ -type f -name '*.c')
 NasmFiles := $(shell find -L Kernel/ -type f -name '*.asm')
-Obj := $(addprefix $(BuildDir)/, $(patsubst %.c, %.o, $(CFiles)) $(patsubst %.asm, %.o, $(NasmFiles)))
+Obj := $(addprefix $(BuildDir), $(patsubst %.c, %.o, $(CFiles)) $(patsubst %.asm, %.o, $(NasmFiles)))
 
 
 .PHONY: all compile
-all: CheckUser compile BuildIso
+all: compile BuildIso
 
-compile: limine.h $(KernelName)
+compile: CheckUser limine.h $(KernelName)
 
 $(KernelName): $(Obj)
-	@echo -e "\n\e[0;32m==> Linking kernel...\e[0m"
-	$(LD) $(Obj) $(LdFlags) -o $(BuildDir)/$@
+	clear
+	@echo -e "\e[0;32m==> Linking kernel...\e[0m"
+	$(LD) $(Obj) $(LdFlags) -o $(BuildDir)$@
 
 
-$(addprefix $(BuildDir)/, %.o): %.c
+$(addprefix $(BuildDir), %.o): %.c
 	$(CC) $(CFlags) -c $< -o $@
 
 
-$(addprefix $(BuildDir)/, %.o): %.asm
+$(addprefix $(BuildDir), %.o): %.asm
 	nasm -f elf64 $< -o $@
 
 
 BuildIso:
-	@echo -e "\n\e[0;32m==> Building .iso image...\e[0m"
+	clear
+	@echo -e "\e[0;32m==> Building .iso image...\e[0m"
 
-	@sudo rm -rf $(BuildDir)/IsoRoot/*
-	@mkdir -p $(BuildDir)/IsoRoot
-	@sudo cp -v $(BuildDir)/Kernel.elf Limine.cfg limine/limine.sys limine/limine-cd.bin limine/limine-cd-efi.bin 12.jpeg $(BuildDir)/IsoRoot
+	@sudo rm -rf $(BuildDir)IsoRoot/*
+	mkdir -p $(BuildDir)IsoRoot
+	sudo cp -v $(BuildDir)Kernel.elf Limine.cfg limine/limine.sys limine/limine-cd.bin limine/limine-cd-efi.bin 12.jpeg $(BuildDir)IsoRoot
 
 	xorriso -as mkisofs -b limine-cd.bin \
         -no-emul-boot -boot-load-size 4 -boot-info-table \
         --efi-boot limine-cd-efi.bin \
         -efi-boot-part --efi-boot-image --protective-msdos-label \
-        $(BuildDir)/IsoRoot -o $(BuildDir)/$(IsoName)
+        $(BuildDir)IsoRoot -o $(BuildDir)$(IsoName)
 
-	limine/limine-deploy $(BuildDir)/$(IsoName)
+	limine/limine-deploy $(BuildDir)$(IsoName)
+
+	sudo chmod -R a=rwx $(BuildDir)
 
 
 .PHONY: limine
@@ -59,11 +63,12 @@ limine:
 
 
 limine.h:
-	@if ! [ -f $(BuildDir)/$@ ]; then \
-		curl https://raw.githubusercontent.com/limine-bootloader/limine/trunk/limine.h -o $(BuildDir)/$@; \
+	@if ! [ -f $(BuildDir)$@ ]; then \
+		curl https://raw.githubusercontent.com/limine-bootloader/limine/trunk/limine.h -o $(BuildDir)$@; \
 	fi
 
-	@echo -e "\n\e[0;32m==> Compiling Kernel...\e[0m"
+	clear
+	@echo -e "\e[0;32m==> Compiling Kernel...\e[0m"
 	
 
 
@@ -75,14 +80,27 @@ CheckUser:
 	fi
 
 
-.PHONY: run debug
+.PHONY: run debug clean
 run:
-	@qemu-system-x86_64 -hda $(BuildDir)/$(IsoName) -d int
+	qemu-system-x86_64 -hda $(BuildDir)$(IsoName) -d int
 
 debug:
-	@qemu-system-x86_64 -hda $(BuildDir)/$(IsoName) -d int -monitor stdio 
+	qemu-system-x86_64 -hda $(BuildDir)$(IsoName) -d int -monitor stdio 
 
-.PHONY: clean
 clean:
-	sudo rm -rf $(BuildDir)/*
-	mkdir -p $(BuildDir)/Kernel/Arch/x86/CPU
+	rm -rf $(BuildDir)*
+	mkdir -p $(BuildDir)Kernel/Arch/x86/
+
+.PHONY: push
+push: CheckUser
+	git status
+
+	@echo -e "\n"
+	@read -n 1 -p "Push changes to github? [y to continue] "; \
+	if ! [ $$REPLY = "y" ]; then \
+		echo -e "\n"; \
+		exit 1; \
+	fi
+
+	@echo -e "\n"
+	git push origin main

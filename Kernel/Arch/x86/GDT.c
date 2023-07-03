@@ -1,5 +1,5 @@
 #include <Common.h>
-#include <CPU/GDT.h>
+#include <Arch/x86/GDT.h>
 
 
 static gdtSeg_t gdt[5];

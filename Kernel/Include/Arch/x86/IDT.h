@@ -4,7 +4,7 @@
 typedef struct {
     uint16_t address0;
     uint16_t segSelector; // Code segment selector in GDT
-    uint8_t ist;
+    uint8_t ist; // Bits 0 to 2 hold the Interrupt Stack Table offset, rest is 0
     uint8_t flags; // Gate type, Reserved, DPL and Present bit
     uint16_t address1;
     uint32_t address2;

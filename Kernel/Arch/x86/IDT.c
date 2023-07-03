@@ -1,6 +1,6 @@
 
 #include <Common.h>
-#include <CPU/IDT.h>
+#include <Arch/x86/IDT.h>
 
 #define idtIntFlags 0x8e
 #define idtTrapFlags 0x8f
