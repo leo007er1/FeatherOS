@@ -1,9 +1,8 @@
 
 #include <Common.h>
 #include <Arch/x86/IDT.h>
+#include <Arch/x86/ISR.h>
 
-#define idtIntFlags 0x8e
-#define idtTrapFlags 0x8f
 
 
 /* IDT
@@ -13,17 +12,25 @@
 */
 
 
-static idtEntry_t idt[256];
-idtr_t idtr;
+void generalExceptionHandler(cpuStatus_t* cpuStatus) {
+    if (cpuStatus->isrNumber == 0) {
+        kprint("\nDivision by 0!\n", 0xff0000);
+    } else {
+        kprint("\nException!\n", 0xff0000);
+    }
 
-extern char genericInterruptStub[];
+    __asm__ volatile("cli");
+    for (;;) {
+        __asm__ volatile("hlt");
+    }
+}
 
 
 static void idtSetEntry(uint8_t vector, uint64_t address, uint8_t ist, uint8_t flags) {
     idtEntry_t* entry = &idt[vector];
 
     entry->address0 = address & 0xFFFF;
-    entry->segSelector = 0x08; // Kernel code segment selector
+    entry->segSelector = kernelCs;
     entry->ist = ist;
     entry->flags = flags;
     entry->address1 = (address >> 16) & 0xFFFF;
@@ -35,9 +42,9 @@ static void idtSetEntry(uint8_t vector, uint64_t address, uint8_t ist, uint8_t f
 void idtInit(void) {
     __asm__ volatile("cli");
 
-    // Let's set all 256 entries
-    for (uint16_t i = 0; i < 256; i++) {
-        idtSetEntry(i, (uint64_t)genericInterruptStub, 0, idtIntFlags);
+    // Sets all exception handlers
+    for (uint16_t i = 0; i < 19; i++) {
+        idtSetEntry(i, (uint64_t)interruptList[i], 0, idtIntFlags);
     }
 
     setIdt(sizeof(idt) - 1, &idt);

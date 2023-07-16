@@ -24,8 +24,7 @@ all: compile BuildIso
 compile: CheckUser limine.h $(KernelName)
 
 $(KernelName): $(Obj)
-	clear
-	@echo -e "\e[0;32m==> Linking kernel...\e[0m"
+	@echo -e "\n\e[0;32m==> Linking kernel...\e[0m"
 	$(LD) $(Obj) $(LdFlags) -o $(BuildDir)$@
 
 
@@ -38,8 +37,7 @@ $(addprefix $(BuildDir), %.o): %.asm
 
 
 BuildIso:
-	clear
-	@echo -e "\e[0;32m==> Building .iso image...\e[0m"
+	@echo -e "\n\e[0;32m==> Building .iso image...\e[0m"
 
 	@sudo rm -rf $(BuildDir)IsoRoot/*
 	mkdir -p $(BuildDir)IsoRoot
@@ -67,8 +65,7 @@ limine.h:
 		curl https://raw.githubusercontent.com/limine-bootloader/limine/trunk/limine.h -o $(BuildDir)$@; \
 	fi
 
-	clear
-	@echo -e "\e[0;32m==> Compiling Kernel...\e[0m"
+	@echo -e "\n\e[0;32m==> Compiling Kernel...\e[0m"
 	
 
 
@@ -90,6 +87,7 @@ debug:
 clean:
 	rm -rf $(BuildDir)*
 	mkdir -p $(BuildDir)Kernel/Arch/x86/
+	mkdir -p $(BuildDir)Kernel/Screen/
 
 .PHONY: push
 push: CheckUser

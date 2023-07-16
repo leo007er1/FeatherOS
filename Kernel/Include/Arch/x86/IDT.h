@@ -1,5 +1,8 @@
 #pragma once
 
+#define idtIntFlags 0x8e
+#define idtTrapFlags 0x8f
+
 
 typedef struct {
     uint16_t address0;
@@ -19,5 +22,11 @@ typedef struct {
 
 } __attribute__((packed)) idtr_t;
 
+
+#define kernelCs 0x08
+#define idtEntries 256
+static idtEntry_t idt[idtEntries];
+idtr_t idtr;
+extern void* interruptList[];
 
 void idtInit(void);

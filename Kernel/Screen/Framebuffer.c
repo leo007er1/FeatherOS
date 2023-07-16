@@ -1,6 +1,6 @@
 
-#include <Framebuffer.h>
-#include <IbmVgaFont.h>
+#include <Screen/Framebuffer.h>
+#include <Screen/IbmVgaFont.h>
 
 
 // *NOTES
@@ -13,17 +13,6 @@ static volatile struct limine_framebuffer_request framebufferRequest = {
     .id = LIMINE_FRAMEBUFFER_REQUEST,
     .revision = 0
 };
-
-
-static int charMask[8] = {128, 64, 32, 16, 8, 4, 2, 1};
-static struct limine_framebuffer* framebuffer;
-static uint32_t* framebufferBase;
-static uint8_t bytesPerPixel;
-static uint16_t pitch;
-
-// Used for keeping track of text position
-static uint16_t posX = 0;
-static uint16_t posY = 0;
 
 
 
@@ -48,24 +37,8 @@ void drawBackground(uint32_t color) {
 }
 
 
-void printf(const uint8_t* string, uint32_t color) {
-    for (size_t currentChar = 0; string[currentChar]; ++currentChar) {
-        if (string[currentChar] == 10) {
-            posX = 0;
-            posY++;
-
-            continue; // No need to draw \n
-        }
-
-        drawChar(string[currentChar], posX * fontCharWidth, posY * fontCharHeight, color);
-        posX++;
-    }
-}
-
-
-void drawChar(uint8_t charToDraw, uint64_t x, uint64_t y, uint32_t color) {
-    uint8_t *c = ibmVga8x16 + (int32_t)(charToDraw * fontCharHeight);
-    int mask[8] = {128, 64, 32, 16, 8, 4, 2, 1};
+void drawChar(char charToDraw, uint64_t x, uint64_t y, uint32_t color) {
+    char* c = ibmVga8x16 + (int32_t)(charToDraw * fontCharHeight);
 
     for (uint16_t charY = 0; charY < fontCharHeight; charY++) {
         for (uint16_t charX = 0; charX < fontCharWidth; charX++) {
@@ -81,4 +54,8 @@ void screenInit(void) {
     framebufferBase = framebuffer->address;
     bytesPerPixel = framebuffer->bpp / 32;
     pitch = framebuffer->pitch / 4;
+    framebufferInfo[0] = framebuffer->width;
+    framebufferInfo[1] = framebuffer->height;
+
+    drawBackground(0x2b2d42);
 }
