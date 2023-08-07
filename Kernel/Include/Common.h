@@ -6,4 +6,4 @@
 
 
 #define abs(x) (x < 0 ? -x : x)
-
+#define swap(x, y) (y = x, x = y)

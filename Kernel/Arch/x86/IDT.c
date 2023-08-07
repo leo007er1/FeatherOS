@@ -1,5 +1,6 @@
 
 #include <Common.h>
+#include <Ports.h>
 #include <Arch/x86/IDT.h>
 #include <Arch/x86/ISR.h>
 
@@ -48,6 +49,10 @@ void idtInit(void) {
     }
 
     setIdt(sizeof(idt) - 1, &idt);
+
+    // Disable PIC
+    outPortB(0x21, 0xff);
+    outPortB(0xa1, 0xff);
 
     __asm__ volatile("sti");
 }

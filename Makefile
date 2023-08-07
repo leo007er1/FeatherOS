@@ -7,7 +7,7 @@ override LD := ld
 
 # All the flags for linker and compiler
 CFlags ?= -Wall -Wextra -std=gnu11 -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -fno-PIE -fno-PIC \
-	-m64 -march=x86-64 -mabi=sysv -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone -mcmodel=kernel -I Kernel/Include/
+	-m64 -march=x86-64 -mabi=sysv -mno-80387 -mno-mmx -mno-red-zone -mcmodel=kernel -I Kernel/Include/
 
 NasmFlags ?= -F dwarf -g
 LdFlags ?= -nostdlib -static -m elf_x86_64 -z max-page-size=0x1000 -no-pie -T Kernel/Linker.ld

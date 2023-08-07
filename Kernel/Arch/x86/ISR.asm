@@ -71,15 +71,16 @@ isrCommonHandler:
 %endmacro
 
 ; Sets every CPU exception handler
+; https://wiki.osdev.org/Exceptions
 
-setIsr 0
-setIsr 1
-setIsr 2
-setIsr 3
-setIsr 4
-setIsr 5
-setIsr 6
-setIsr 7
+setIsr 0 ; Division by 0
+setIsr 1 ; Debug
+setIsr 2 ; NMI
+setIsr 3 ; Breakpoint
+setIsr 4 ; Overflow
+setIsr 5 ; Bound range exceeded
+setIsr 6 ; Invalid opcode
+setIsr 7 ; Device not avaiable
 setIsrError 8 ; Double fault
 setIsr 9 ; Coprocessor segment overrun
 setIsrError 10 ; Invalid TSS

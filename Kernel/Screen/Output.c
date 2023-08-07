@@ -4,7 +4,7 @@
 #include <Screen/Output.h>
 
 
-static int textColor = defaultTextColor;
+static uint32_t textColor = defaultTextColor;
 static va_list* kprintArg;
 
 
@@ -60,8 +60,8 @@ void kprintChar(void) {
 }
 
 void kprintColor(void) {
-    int* arg = va_arg(*kprintArg, int*);
-    textColor = *arg;
+    uint32_t* arg = va_arg(*kprintArg, uint32_t*);
+    textColor = arg;
 }
 
 void kprintInvalid(void) {
