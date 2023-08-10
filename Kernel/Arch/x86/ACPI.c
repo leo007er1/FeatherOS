@@ -1,5 +1,5 @@
 
-#include <ACPI.h>
+#include <Arch/x86/ACPI.h>
 
 
 // See https://github.com/limine-bootloader/limine/blob/v4.x-branch/PROTOCOL.md

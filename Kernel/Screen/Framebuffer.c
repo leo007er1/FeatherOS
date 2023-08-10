@@ -93,6 +93,16 @@ void drawChar(char charToDraw, uint32_t x, uint32_t y, uint32_t color) {
 }
 
 
+void clearScreen(uint32_t color) {
+    for (size_t i = 0; i < (framebuffer->width * framebuffer->height); i++) {
+        framebufferBase[i] = color;
+    }
+
+    posX = 0;
+    posY = 0;
+}
+
+
 void screenInit(void) {
     // Get the first framebuffer
     framebuffer = framebufferRequest.response->framebuffers[0];

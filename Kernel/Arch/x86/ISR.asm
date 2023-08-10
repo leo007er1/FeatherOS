@@ -1,6 +1,7 @@
 [bits 64]
 [global interruptList]
 [extern generalExceptionHandler]
+[extern keyboardIrqHandler]
 
 
 %macro pushaq 0
@@ -94,6 +95,24 @@ setIsrError 17 ; Alignment check
 setIsr 18 ; Machine check
 setIsr 19 ; SIMD floating-point exception
 ; From this point here there are unused exceptions
+
+; IRQ 1, keyboard
+[global isr33]
+isr33:
+    push 1
+    push 33
+
+    pushaq
+    cld
+
+    mov rdi, rsp ; System V x86-64 uses rdi as the first argument for a function. (rsp is the stack pointer)
+    call keyboardIrqHandler
+    mov rsp, rax ; And the return value is in rax
+
+    popaq
+    add rsp, 16
+    iretq
+
 
 
 %assign i 0

@@ -1,8 +1,10 @@
 
 #include <Common.h>
-#include <Ports.h>
 #include <Arch/x86/IDT.h>
 #include <Arch/x86/ISR.h>
+#include <Screen/Terminal.h>
+#include <Arch/x86/PIC.h>
+#include <Screen/Framebuffer.h>
 
 
 
@@ -14,11 +16,36 @@
 
 
 void generalExceptionHandler(cpuStatus_t* cpuStatus) {
-    if (cpuStatus->isrNumber == 0) {
-        kprint("\nDivision by 0!\n", 0xff0000);
-    } else {
-        kprint("\nException!\n", 0xff0000);
-    }
+    clearScreen(0x000000);
+
+    print(R"(
+                            ...
+                            ;::::;
+                        ;::::; :;
+                        ;:::::'   :;
+                        ;:::::;     ;.
+                    ,:::::'       ;           OOO\
+                    ::::::;       ;          OOOOO\
+                    ;:::::;       ;         OOOOOOOO
+                    ,;::::::;     ;'         / OOOOOOO
+                    ;:::::::::`. ,,,;.        /  / DOOOOOO
+                .';:::::::::::::::::;,     /  /     DOOOO
+                ,::::::;::::::;;;;::::;,   /  /        DOOO
+                ;`::::::`'::::::;;;::::: ,#/  /          DOOO
+                :`:::::::`;::::::;;::: ;::#  /            DOOO
+                ::`:::::::`;:::::::: ;::::# /              DOO
+                `:`:::::::`;:::::: ;::::::#/               DOO
+                :::`:::::::`;; ;:::::::::##                OO
+                ::::`:::::::`;::::::::;:::#                OO
+                `:::::`::::::::::::;'`:;::#                O 
+                `:::::`::::::::;' /  / `:#                  
+                ::::::`:::::;'  /  /   `#
+
+                          %bOh no! An exception!%b
+                
+                The %bmagic reaper%b just destroyed FeatherOS!
+                   %bKill him by restarting the computer!)", 0xef233c, 0xffffff, 0x8338ec, 0xffffff, 0x57cc99);
+
 
     __asm__ volatile("cli");
     for (;;) {
@@ -48,11 +75,12 @@ void idtInit(void) {
         idtSetEntry(i, (uint64_t)interruptList[i], 0, idtIntFlags);
     }
 
+    idtSetEntry(33, (uint64_t)isr33, 0, idtIntFlags);
+
     setIdt(sizeof(idt) - 1, &idt);
 
-    // Disable PIC
-    outPortB(0x21, 0xff);
-    outPortB(0xa1, 0xff);
+    // To use the IOAPIC and local APIC, we need to disable 8259 PIC emulation
+    picDisable();
 
     __asm__ volatile("sti");
 }

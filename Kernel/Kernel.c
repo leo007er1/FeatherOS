@@ -1,20 +1,23 @@
 
 #include <Common.h>
 #include <Screen/Framebuffer.h>
-#include <Screen/Output.h>
-#include <ACPI.h>
+#include <Screen/Terminal.h>
+#include <Arch/x86/ACPI.h>
+#include <IO/Ps2Keyboard.h>
 
 
 
 void __attribute__((section(".entry"))) kernelInit(void) {
     screenInit();
     gdtInit();
-    kprint("%bGDT initialized succesfully!\n", 0x57cc99);
+    print("%bGDT initialized succesfully!\n", 0x57cc99);
     idtInit(); // KABUUMM
-    kprint("%bIDT initialized succesfully!\n", 0x57cc99);
+    print("%bIDT initialized succesfully!\n", 0x57cc99);
     acpiInit();
-    kprint("%bParsed ACPI tables\n", 0x57cc99);
+    print("%bParsed ACPI tables\n", 0x57cc99);
     sseInit();
+    keyboardInit();
+
     drawLine(200, 200, 250, 400, 0xffba00);
     drawLine(250, 400, 370, 400, 0xffba00);
     drawLine(370, 400, 200, 200, 0xffba00);

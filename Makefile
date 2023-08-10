@@ -88,6 +88,7 @@ clean:
 	rm -rf $(BuildDir)*
 	mkdir -p $(BuildDir)Kernel/Arch/x86/
 	mkdir -p $(BuildDir)Kernel/Screen/
+	mkdir -p $(BuildDir)Kernel/IO/
 
 .PHONY: push
 push: CheckUser

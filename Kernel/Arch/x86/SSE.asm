@@ -1,7 +1,7 @@
 [bits 64]
 [extern pushaq]
 [extern popaq]
-[extern kprint]
+[extern print]
 
 ; https://wiki.osdev.org/SSE
 
@@ -10,7 +10,7 @@
 sseInit:
     mov eax, 1
     cpuid
-    test edx, 1 << 25
+    test edx, 1 << 25 ; SSE bit
     jz .noSse
 
     push rcx
@@ -24,7 +24,8 @@ sseInit:
     mov cr4, rax
 
     lea rdi, sseEnabledMessage
-    call kprint
+    mov rsi, 0x57cc99
+    call print
 
     ; Check for SSE5 and AVX support
     pop rcx
@@ -42,18 +43,20 @@ sseInit:
 
     .noAvx:
         lea rdi, noAvxMessage
-        call kprint
+        lea rsi, 0xef233c
+        call print
 
         ret
 
     .noSse:
         lea rdi, noSseMessage
-        call kprint
+        mov rsi, 0xef233c
+        call print
 
         ret
 
 
 
-noSseMessage: db "SSE not present on x86_64 machine!?", 10, 0
-noAvxMessage: db "SSE5 and AVX not supported!", 10, 0
-sseEnabledMessage: db "SSE enabled", 10, 0
+noSseMessage: db "%bSSE not present on x86_64 machine!?", 10, 0
+noAvxMessage: db "%bSSE5 and AVX not supported!", 10, 0
+sseEnabledMessage: db "%bSSE enabled", 10, 0

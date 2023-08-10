@@ -1,14 +1,19 @@
 
 #include <Common.h>
 #include <Screen/Framebuffer.h>
-#include <Screen/Output.h>
+#include <Screen/Terminal.h>
 
 
 static uint32_t textColor = defaultTextColor;
-static va_list* kprintArg;
+static va_list* printArg;
 
 
-void kprint(const char* string, ...) {
+// int vfprintf(void* stream, va_list va, ...) {
+    // 
+// }
+
+
+int print(const char* string, ...) {
     // https://publications.gbdirect.co.uk/c_book/chapter9/stdarg.html
     va_list argList;
     va_start(argList, string);
@@ -24,8 +29,8 @@ void kprint(const char* string, ...) {
         }
 
         if (currentChar == 37) {
-            kprintArg = &argList; // Pointer to current argument
-            kprintFunc[string[stringPos + 1] - 97](); // Execute the function associated to a letter(c for char and so on)
+            printArg = &argList; // Pointer to current argument
+            printFunc[string[stringPos + 1] - 97](); // Execute the function associated to a letter(c for char and so on)
             stringPos++;
 
             continue;
@@ -49,21 +54,22 @@ void kprint(const char* string, ...) {
 
     va_end(argList);
     textColor = defaultTextColor;
+    return 0;
 }
 
-// These are functions for handling other kprint arguments when using %c and similar
+// These are functions for handling other print arguments when using %c and similar
 
-void kprintChar(void) {
-    char* arg = va_arg(*kprintArg, char*);
+void printChar(void) {
+    char* arg = va_arg(*printArg, char*);
     drawChar(*arg, posX, posY, textColor);
     posX += fontCharWidth;
 }
 
-void kprintColor(void) {
-    uint32_t* arg = va_arg(*kprintArg, uint32_t*);
+void printColor(void) {
+    uint32_t* arg = va_arg(*printArg, uint32_t*);
     textColor = arg;
 }
 
-void kprintInvalid(void) {
+void printInvalid(void) {
     return;
 }

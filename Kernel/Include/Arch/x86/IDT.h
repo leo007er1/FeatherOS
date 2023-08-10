@@ -28,5 +28,6 @@ typedef struct {
 static idtEntry_t idt[idtEntries];
 idtr_t idtr;
 extern void* interruptList[];
+extern void* isr33;
 
 void idtInit(void);
