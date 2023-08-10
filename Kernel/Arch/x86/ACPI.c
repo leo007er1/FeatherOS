@@ -1,5 +1,7 @@
 
+#include <Common.h>
 #include <Arch/x86/ACPI.h>
+#include <Screen/Terminal.h>
 
 
 // See https://github.com/limine-bootloader/limine/blob/v4.x-branch/PROTOCOL.md
@@ -9,13 +11,16 @@ static volatile struct limine_rsdp_request rsdpRequest = {
 };
 
 
+static bool isAcpiXsdt = false;
+
+
 
 // Performs checksum of a table
 static bool checkTable(const void* table, size_t lenght) {
     uint8_t* tablePtr = (uint8_t*)table;
     uint32_t len = 0;
 
-    for (uint16_t i = 0; i < lenght; i++) {
+    for (size_t i = 0; i < lenght; i++) {
         len += tablePtr[i];
     }
 
@@ -26,6 +31,7 @@ static bool checkTable(const void* table, size_t lenght) {
 
 void acpiInit(void) {
     struct rsdpDescriptor* rsdp = rsdpRequest.response->address;
+    uint64_t rootTablePointer = 0;
 
     // If 0 we are good to go, or else... INTO THE MATRIX
     if (checkTable(rsdp, sizeof(rsdp)) != 0) {
@@ -35,13 +41,28 @@ void acpiInit(void) {
         }
     }
 
-    if (rsdp->revision == 0) {
+    if (rsdp->revision > 0) {
+        // ACPI 2.0 or higher
+
+        struct rsdp2Descriptor* rsdp2 = (struct rsdp2Descriptor*)rsdp;
+
+        if (rsdp2->xsdtAddress != 0) {
+            print("Found XSDT!\n");
+            rootTablePointer = rsdp2->xsdtAddress;
+            isAcpiXsdt = true;
+
+        } else {
+            print("No XSDT, using RSDT.\n");
+            rootTablePointer = (uint64_t)rsdp2->rsdtAddress;
+        }
+
+    } else if (rsdp->revision == 0) {
         // ACPI 1.0
 
-        // Parse RSDT
-    } else if (rsdp->revision == 2) {
-        // ACPI 2.0 and newer
-
-        // Parse XSDT
+        print("ACPI 1.0. Using RSDT.\n");
+        rootTablePointer = (uint64_t)rsdp->rsdtAddress;
     }
+
+    if (!rootTablePointer) print("%bNo ACPI root table!\n", 0xef233c);
+    
 }

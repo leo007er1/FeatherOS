@@ -65,6 +65,11 @@ void printChar(void) {
     posX += fontCharWidth;
 }
 
+void printString(void) {
+    char* arg = va_arg(*printArg, char*);
+    print(arg);
+}
+
 void printColor(void) {
     uint32_t* arg = va_arg(*printArg, uint32_t*);
     textColor = arg;

@@ -44,19 +44,19 @@ struct acpiSdtHeader {
 } __attribute__((packed));
 
 
-// struct rsdtDescriptor {
-//     struct acpiSdtHeader header;
-//     uint32_t sdtAddresses[(header.lenght - sizeof(header)) / 4];
+struct rsdtDescriptor {
+    struct acpiSdtHeader header;
+    uint32_t sdtAddresses[];
 
-// } __attribute__((packed));
+} __attribute__((packed));
 
 
-// // XSDT is unique to newer ACPI versions
-// struct xsdtDescriptor {
-//     struct acpiSdtHeader header;
-//     uint64_t sdtAddresses[(header.lenght - sizeof(header)) / 8];
+// XSDT is unique to newer ACPI versions
+struct xsdtDescriptor {
+    struct acpiSdtHeader header;
+    uint64_t sdtAddresses[];
 
-// } __attribute__((packed));
+} __attribute__((packed));
 
 
 void acpiInit(void);
