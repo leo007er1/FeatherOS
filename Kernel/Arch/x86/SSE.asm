@@ -1,7 +1,7 @@
 [bits 64]
 [extern pushaq]
 [extern popaq]
-[extern print]
+[extern log]
 
 ; https://wiki.osdev.org/SSE
 
@@ -25,33 +25,52 @@ sseInit:
 
     lea rdi, sseEnabledMessage
     mov rsi, 0x57cc99
-    call print
+    call log
 
-    ; Check for SSE5 and AVX support
     pop rcx
-    ; test ecx, 1 << 28 ; Bit for AVX
-    ; jz .noAvx
-    ; test ecx, 1 << 26 ; Bit for XSAVE(used to manage extended processor states)
-    ; jz .noAvx
 
-    ; xor rcx, rcx
-    ; xgetbv ; Load XCR0 register
-    ; or eax, 7 ; Set AVX, SSE, X87 bits
-    ; xsetbv ; Set XCR0 register
+    ; Check for SSE5 and AVX support(code from Intel sdm vol. 1 14.3)
+    test ecx, 1 << 28 ; Bit for AVX
+    jz .noAvx
+    test ecx, 1 << 26 ; Bit for XSAVE(used to manage extended processor states)
+    jz .noAvx
+
+    and ecx, 018000000h
+    cmp ecx, 018000000h ; Check for OSXSAVE and AVX
+    jne .noAvx
+
+    xor rcx, rcx
+    xgetbv
+    and eax, 06h
+    cmp eax, 06h ; Check for XMM and YMM support
+    jne .noAvx
+
+    mov rax, cr4
+    or rax, 1 << 18 ; Set cr4.OSXSAVE bit
+    mov cr4, rax
+
+    xor rcx, rcx
+    xgetbv ; Load XCR0 register
+    or eax, 7 ; Set AVX, SSE, X87 bits
+    xsetbv ; Set XCR0 register
+
+    lea rdi, avxEnabledMessage
+    mov rsi, 0x57cc99
+    call log
 
     ret
 
     .noAvx:
         lea rdi, noAvxMessage
         lea rsi, 0xef233c
-        call print
+        call log
 
         ret
 
     .noSse:
         lea rdi, noSseMessage
         mov rsi, 0xef233c
-        call print
+        call log
 
         ret
 
@@ -60,3 +79,4 @@ sseInit:
 noSseMessage: db "%bSSE not present on x86_64 machine!?", 10, 0
 noAvxMessage: db "%bSSE5 and AVX not supported!", 10, 0
 sseEnabledMessage: db "%bSSE enabled", 10, 0
+avxEnabledMessage: db "%bAVX enabled", 10, 0

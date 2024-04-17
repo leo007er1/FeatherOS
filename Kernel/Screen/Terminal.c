@@ -5,15 +5,16 @@
 
 
 static uint32_t textColor = defaultTextColor;
-static va_list* printArg;
+static va_list* logArg;
 
 
-// int vfprintf(void* stream, va_list va, ...) {
-    // 
-// }
+void terminalInit(void) {
+    drawBackground(defaultBackgroundColor);
+}
 
 
-int print(const char* string, ...) {
+
+int log(const char* string, ...) {
     // https://publications.gbdirect.co.uk/c_book/chapter9/stdarg.html
     va_list argList;
     va_start(argList, string);
@@ -29,8 +30,8 @@ int print(const char* string, ...) {
         }
 
         if (currentChar == 37) {
-            printArg = &argList; // Pointer to current argument
-            printFunc[string[stringPos + 1] - 97](); // Execute the function associated to a letter(c for char and so on)
+            logArg = &argList; // Pointer to current argument
+            logFunc[string[stringPos + 1] - 97](); // Execute the function associated to a letter(c for char and so on)
             stringPos++;
 
             continue;
@@ -57,24 +58,32 @@ int print(const char* string, ...) {
     return 0;
 }
 
-// These are functions for handling other print arguments when using %c and similar
+// These are functions for handling other log arguments when using %c and similar
 
-void printChar(void) {
-    char* arg = va_arg(*printArg, char*);
+void logChar(void) {
+    char* arg = va_arg(*logArg, char*);
     drawChar(*arg, posX, posY, textColor);
     posX += fontCharWidth;
 }
 
-void printString(void) {
-    char* arg = va_arg(*printArg, char*);
-    print(arg);
+void logInt(void) {
+    uint32_t currentColor = textColor;
+    uint64_t* arg = va_arg(*logArg, uint64_t*);
+    log(IntToString(arg));
+
+    textColor = currentColor; // When recalling log the color gets changed to the default one
 }
 
-void printColor(void) {
-    uint32_t* arg = va_arg(*printArg, uint32_t*);
+void logString(void) {
+    char* arg = va_arg(*logArg, char*);
+    log(arg);
+}
+
+void logColor(void) {
+    uint32_t* arg = va_arg(*logArg, uint32_t*);
     textColor = arg;
 }
 
-void printInvalid(void) {
+void logInvalid(void) {
     return;
 }

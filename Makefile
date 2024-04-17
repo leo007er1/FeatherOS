@@ -89,6 +89,8 @@ clean:
 	mkdir -p $(BuildDir)Kernel/Arch/x86/
 	mkdir -p $(BuildDir)Kernel/Screen/
 	mkdir -p $(BuildDir)Kernel/IO/
+	mkdir -p $(BuildDir)Kernel/Memory/
+	mkdir -p $(BuildDir)Kernel/Utils/
 
 .PHONY: push
 push: CheckUser

@@ -8,7 +8,6 @@
 // bpp = bits per pixel
 
 
-// See https://github.com/limine-bootloader/limine/blob/v4.x-branch/PROTOCOL.md
 static volatile struct limine_framebuffer_request framebufferRequest = {
     .id = LIMINE_FRAMEBUFFER_REQUEST,
     .revision = 0
@@ -111,6 +110,4 @@ void screenInit(void) {
     pitch = framebuffer->pitch / 4;
     framebufferInfo[0] = framebuffer->width;
     framebufferInfo[1] = framebuffer->height;
-
-    drawBackground(0x2b2d42);
 }

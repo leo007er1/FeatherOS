@@ -34,7 +34,7 @@ static const char* exceptionsNames[] = {
 void generalExceptionHandler(cpuStatus_t* cpuStatus) {
     clearScreen(0x000000);
 
-    print(R"(
+    log(R"(
                             ...
                             ;::::;
                         ;::::; :;

@@ -15,7 +15,7 @@
 
 void keyboardIrqHandler() {
     uint8_t scancode = inPortB(ps2Data);
-    print("Scancode: %c", scancode);
+    log("Scancode: %c", scancode);
 }
 
 
@@ -23,7 +23,7 @@ void keyboardInit() {
     // TODO: Check in FADT ACPI table if there are PS/2 controllers first!
 
     bool dualChannel = false;
-    print("\nInitilizing PS/2 keyboard...\n");
+    log("\nInitilizing PS/2 keyboard...\n");
 
     // Disable PS/2 ports
     outPortB(ps2Reg, 0xad);
@@ -42,13 +42,13 @@ void keyboardInit() {
     // Test PS/2 controller
     outPortB(ps2Reg, 0xaa);
     if(inPortB(ps2Data) != 0x55) {
-        print("%bPS/2 controller test failed!\n", 0xef233c);
+        log("%bPS/2 controller test failed!\n", 0xef233c);
         return;
     }
 
     // Check if it's a single channel controller or not
     if (dualChannel) {
-        print("Dual channel PS/2 controller\n");
+        log("Dual channel PS/2 controller\n");
         outPortB(ps2Reg, 0xa8); // Enable second PS/2 port
         outPortB(ps2Reg, 0x20);
         configByte = inPortB(ps2Data);
@@ -63,13 +63,13 @@ void keyboardInit() {
     // Test ports
     outPortB(ps2Reg, 0xab);
     if (inPortB(ps2Data)) {
-        print("%bPS/2 error: first port unavaiable!\n", 0xef233c);
+        log("%bPS/2 error: first port unavaiable!\n", 0xef233c);
         return;
     }
     if (dualChannel) {
         outPortB(ps2Reg, 0xa9);
         if (inPortB(ps2Data)) {
-            print("%bPS/2 error: second port unavaiable!\n", 0xef233c);
+            log("%bPS/2 error: second port unavaiable!\n", 0xef233c);
             return;
         }
     }
@@ -84,5 +84,5 @@ void keyboardInit() {
     outPortB(ps2Reg, ps2Data);
     outPortB(ps2Data, configByte);
     
-    print("%bPS/2 driver initialized succesfully!", 0x57cc99);
+    log("%bPS/2 driver initialized succesfully!", 0x57cc99);
 }

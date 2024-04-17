@@ -47,22 +47,22 @@ void acpiInit(void) {
         struct rsdp2Descriptor* rsdp2 = (struct rsdp2Descriptor*)rsdp;
 
         if (rsdp2->xsdtAddress != 0) {
-            print("Found XSDT!\n");
+            log("Found XSDT!\n");
             rootTablePointer = rsdp2->xsdtAddress;
             isAcpiXsdt = true;
 
         } else {
-            print("No XSDT, using RSDT.\n");
+            log("No XSDT, using RSDT.\n");
             rootTablePointer = (uint64_t)rsdp2->rsdtAddress;
         }
 
     } else if (rsdp->revision == 0) {
         // ACPI 1.0
 
-        print("ACPI 1.0. Using RSDT.\n");
+        log("ACPI 1.0. Using RSDT.\n");
         rootTablePointer = (uint64_t)rsdp->rsdtAddress;
     }
 
-    if (!rootTablePointer) print("%bNo ACPI root table!\n", 0xef233c);
+    if (!rootTablePointer) log("%bNo ACPI root table!\n", 0xef233c);
     
 }
