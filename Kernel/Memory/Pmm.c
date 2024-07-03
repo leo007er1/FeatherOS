@@ -5,7 +5,7 @@
 // Oh yeah only one page size is supported(0x1000)
 
 
-#include <Memory/PMM.h>
+#include <Memory/Pmm.h>
 
 
 static volatile struct limine_memmap_request memmapRequest = {

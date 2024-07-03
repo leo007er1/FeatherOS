@@ -6,6 +6,8 @@
 #define defaultTextColor 0xffffff
 #define defaultBackgroundColor 0x000000
 
+void terminalInit(void);
+
 int log(const char* string, ...);
 void logChar(void);
 void logInt(void);

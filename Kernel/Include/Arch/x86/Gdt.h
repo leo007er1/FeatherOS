@@ -20,3 +20,4 @@ typedef struct {
 
 
 void gdtInit(void);
+extern void reloadGdt();

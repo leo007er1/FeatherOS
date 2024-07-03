@@ -6,7 +6,7 @@ override CC := gcc
 override LD := ld
 
 # All the flags for linker and compiler
-CFlags ?= -Wall -Wextra -std=gnu11 -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -fno-PIE -fno-PIC \
+CFlags ?= -Wall -Wno-unused-variable -Wextra -std=gnu11 -ffreestanding -fno-stack-protector -fno-stack-check -fno-lto -fno-PIE -fno-PIC \
 	-m64 -march=x86-64 -mabi=sysv -mno-80387 -mno-mmx -mno-red-zone -mcmodel=kernel -I Kernel/Include/
 
 NasmFlags ?= -F dwarf -g
@@ -27,6 +27,7 @@ $(KernelName): $(Obj)
 	@echo -e "\n\e[0;32m==> Linking kernel...\e[0m"
 	$(LD) $(Obj) $(LdFlags) -o $(BuildDir)$@
 
+	@echo -e "\n\e[0;32m==> Finished compiling...\e[0m"
 
 $(addprefix $(BuildDir), %.o): %.c
 	$(CC) $(CFlags) -c $< -o $@

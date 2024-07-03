@@ -69,7 +69,7 @@ void logChar(void) {
 void logInt(void) {
     uint32_t currentColor = textColor;
     uint64_t* arg = va_arg(*logArg, uint64_t*);
-    log(IntToString(arg));
+    log(IntToString((uint64_t)arg));
 
     textColor = currentColor; // When recalling log the color gets changed to the default one
 }
@@ -81,7 +81,7 @@ void logString(void) {
 
 void logColor(void) {
     uint32_t* arg = va_arg(*logArg, uint32_t*);
-    textColor = arg;
+    textColor = (uint32_t)arg;
 }
 
 void logInvalid(void) {

@@ -2,10 +2,13 @@
 #include <Common.h>
 #include <Screen/Framebuffer.h>
 #include <Screen/Terminal.h>
-#include <Arch/x86/ACPI.h>
+#include <Arch/x86/Gdt.h>
+#include <Arch/x86/Idt.h>
+#include <Arch/x86/Acpi.h>
 #include <IO/Ps2Keyboard.h>
-#include <Memory/PMM.h>
+#include <Memory/Pmm.h>
 
+extern void sseInit();
 
 
 void __attribute__((section(".entry"))) kernelInit(void) {

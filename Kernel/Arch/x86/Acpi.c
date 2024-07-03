@@ -1,6 +1,6 @@
 
 #include <Common.h>
-#include <Arch/x86/ACPI.h>
+#include <Arch/x86/Acpi.h>
 #include <Screen/Terminal.h>
 
 

@@ -1,7 +1,19 @@
 #pragma once
 
+#include <IO/Ports.h>
+
 #define idtIntFlags 0x8e
 #define idtTrapFlags 0x8f
+
+#define picCommandMaster 0x20
+#define picDataMaster 0x21
+#define picCommandSlave 0xa0
+#define picDataSlave 0xa1
+
+void picSendEoi(uint8_t irq);
+void picDisable(void);
+
+extern void setIdt();
 
 
 typedef struct {
@@ -25,9 +37,6 @@ typedef struct {
 
 #define kernelCs 0x08
 #define idtEntries 256
-static idtEntry_t idt[idtEntries];
-idtr_t idtr;
-extern void* interruptList[];
-extern void* isr33;
+
 
 void idtInit(void);
