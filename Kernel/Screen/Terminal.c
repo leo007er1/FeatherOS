@@ -9,7 +9,8 @@ static va_list* logArg;
 
 
 void terminalInit(void) {
-    drawBackground(defaultBackgroundColor);
+    log("\n\n\n%b -- /// %bFeatherOS v0.0.1 %b", 0x57cc99, 0xFFFFFF, 0x57cc99);
+    log("\n\nKernel > ");
 }
 
 

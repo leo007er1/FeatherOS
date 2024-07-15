@@ -1,7 +1,5 @@
 [bits 64]
-[global interruptList]
-[extern generalExceptionHandler]
-[extern keyboardIrqHandler]
+[extern generalIsrHandler]
 
 
 %macro pushaq 0
@@ -42,20 +40,6 @@
 %endmacro
 
 
-isrCommonHandler:
-    pushaq
-    cld
-
-    mov rdi, rsp ; System V x86-64 uses rdi as the first argument for a function. (rsp is the stack pointer)
-    call generalExceptionHandler
-    mov rsp, rax ; And the return value is in rax
-
-    popaq
-    add rsp, 16
-    iretq
-
-
-
 %macro setIsr 1
     isr%+%1:
         push 0
@@ -71,7 +55,22 @@ isrCommonHandler:
         jmp isrCommonHandler
 %endmacro
 
-; Sets every CPU exception handler
+
+isrCommonHandler:
+    pushaq
+    cld
+
+    mov rdi, rsp ; System V x86-64 uses rdi as the first argument for a function. (rsp is the stack pointer)
+    call generalIsrHandler
+    mov rsp, rax ; And the return value is in rax
+
+    popaq
+    add rsp, 16
+    iretq
+
+
+
+; Sets every CPU exception handler and some IRQs
 ; https://wiki.osdev.org/Exceptions
 
 setIsr 0 ; Division by 0
@@ -94,30 +93,29 @@ setIsr 16 ; x87 floating-point exception, unused
 setIsrError 17 ; Alignment check
 setIsr 18 ; Machine check
 setIsr 19 ; SIMD floating-point exception
-; From this point here there are unused exceptions
+setIsr 20 ; Virtualization exception
+setIsrError 21 ; Control protection exception
+setIsr 22 ; All reserved
+setIsr 23
+setIsr 24
+setIsr 25
+setIsr 26
+setIsr 27
+setIsr 28 ; Hypervisor injection exception
+setIsrError 29 ; VMM communication exception
+setIsrError 30 ; Security exception
+setIsr 31 ; Reserved
 
-; IRQ 1, keyboard
-[global isr33]
-isr33:
-    push 1
-    push 33
-
-    pushaq
-    cld
-
-    mov rdi, rsp ; System V x86-64 uses rdi as the first argument for a function. (rsp is the stack pointer)
-    call keyboardIrqHandler
-    mov rsp, rax ; And the return value is in rax
-
-    popaq
-    add rsp, 16
-    iretq
+; IRQs
+setIsr 32 ; PIT
+setIsr 33 ; Keyboard
 
 
-
+[global interruptList]
 %assign i 0
 interruptList:
-    %rep 19
+    %rep 33
         dq isr%+i
         %assign i i + 1
     %endrep
+

@@ -1,19 +1,11 @@
 #pragma once
 
+#include <Common.h>
 #include <IO/Ports.h>
+#include <Arch/x86/Pic.h>
 
 #define idtIntFlags 0x8e
 #define idtTrapFlags 0x8f
-
-#define picCommandMaster 0x20
-#define picDataMaster 0x21
-#define picCommandSlave 0xa0
-#define picDataSlave 0xa1
-
-void picSendEoi(uint8_t irq);
-void picDisable(void);
-
-extern void setIdt();
 
 
 typedef struct {

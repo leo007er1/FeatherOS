@@ -1,4 +1,7 @@
+
 #pragma once
+
+#include <Common.h>
 
 
 // Used to check the values pushed to the stack from the ISR handlers
@@ -31,3 +34,6 @@ typedef struct {
     uint64_t ss;
     
 } __attribute__((packed)) cpuStatus_t;
+
+
+void generalIsrHandler(cpuStatus_t* cpuStatus);

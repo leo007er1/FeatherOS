@@ -110,4 +110,6 @@ void screenInit(void) {
     pitch = framebuffer->pitch / 4;
     framebufferInfo[0] = framebuffer->width;
     framebufferInfo[1] = framebuffer->height;
+
+    drawBackground(0x000000);
 }

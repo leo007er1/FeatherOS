@@ -5,15 +5,23 @@
 #include <Arch/x86/Gdt.h>
 #include <Arch/x86/Idt.h>
 #include <Arch/x86/Acpi.h>
-#include <IO/Ps2Keyboard.h>
+#include <IO/Keyboard.h>
 #include <Memory/Pmm.h>
 
 extern void sseInit();
 
 
+static volatile struct limine_boot_time_request bootTimeRequest = {
+    .id = LIMINE_BOOT_TIME_REQUEST,
+    .revision = 0
+};
+
+
 void __attribute__((section(".entry"))) kernelInit(void) {
     screenInit();
-    terminalInit();
+
+    log("Time since UNIX time: %d seconds\n\n", (uint64_t)bootTimeRequest.response->boot_time);
+
     gdtInit();
     log("%bGDT initialized succesfully!\n", 0x57cc99);
     idtInit(); // KABUUMM
@@ -24,14 +32,10 @@ void __attribute__((section(".entry"))) kernelInit(void) {
     log("%bMemory size: %dMB\n", 0x57cc99, (uint64_t)(GetMemorySize() / 1048576));
 
     keyboardInit();
-
-    drawLine(300, 200, 250, 450, 0xffba00);
-    drawLine(250, 450, 350, 450, 0xffba00);
-    drawLine(350, 450, 300, 200, 0xffba00);
+    terminalInit();
+    
 
     __asm__ volatile("cli");
-    for (;;) {
-        __asm__ volatile("hlt");
-    }
+    while(1) __asm__("hlt\n\t");
 
 }
