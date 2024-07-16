@@ -33,9 +33,11 @@ void __attribute__((section(".entry"))) kernelInit(void) {
 
     keyboardInit();
     terminalInit();
-    
+
+    // ! Here General Protection Fault is raised
+    //* __asm__ volatile("int $0x21");
 
     __asm__ volatile("cli");
-    while(1) __asm__("hlt\n\t");
+    for (;;) __asm__ volatile("hlt");
 
 }

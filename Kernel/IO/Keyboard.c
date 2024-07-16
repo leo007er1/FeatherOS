@@ -4,8 +4,8 @@
 #include <Screen/Terminal.h>
 
 // * NOTES
-// https://wiki.osdev.org/%228042%22_PS/2_Controller
-// https://wiki.osdev.org/Keyboard
+// https://osdev.wiki/wiki/%228042%22_PS/2_Controller
+// https://osdev.wiki/wiki/PS/2_Keyboard
 // Keyboard is IRQ 1
 // I/O ports:
 // 0x60 -> data port

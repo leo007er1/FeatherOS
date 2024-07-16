@@ -5,6 +5,7 @@
 
 /* IDT
  0 - 31 -> CPU exceptions
+ 32 -> IRQ0 PIT
  33 -> IRQ1 keyboard
 
 */

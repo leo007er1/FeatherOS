@@ -1,5 +1,6 @@
 [bits 64]
 [extern generalIsrHandler]
+[extern generalIrqHandler]
 
 
 %macro pushaq 0
@@ -56,6 +57,15 @@
 %endmacro
 
 
+%macro setIrq 1
+    irq%+%1:
+        push %1
+        push (32 + %1)
+
+        jmp irqCommonHandler
+%endmacro
+
+
 isrCommonHandler:
     pushaq
     cld
@@ -69,9 +79,22 @@ isrCommonHandler:
     iretq
 
 
+irqCommonHandler:
+    pushaq
+    cld
+
+    mov rdi, rsp ; System V x86-64 uses rdi as the first argument for a function. (rsp is the stack pointer)
+    call generalIrqHandler
+    mov rsp, rax ; And the return value is in rax
+
+    popaq
+    add rsp, 16
+    iretq
+
+
 
 ; Sets every CPU exception handler and some IRQs
-; https://wiki.osdev.org/Exceptions
+; https://osdev.wiki/wiki/Exceptions
 
 setIsr 0 ; Division by 0
 setIsr 1 ; Debug
@@ -107,15 +130,23 @@ setIsrError 30 ; Security exception
 setIsr 31 ; Reserved
 
 ; IRQs
-setIsr 32 ; PIT
-setIsr 33 ; Keyboard
+setIrq 0 ; PIT
+setIrq 1 ; Keyboard
+
 
 
 [global interruptList]
 %assign i 0
 interruptList:
-    %rep 33
+    ; Exceptions
+    %rep 32
         dq isr%+i
         %assign i i + 1
     %endrep
 
+    ; IRQs
+    %assign i 0
+    %rep 2
+        dq irq%+i
+        %assign i i + 1
+    %endrep

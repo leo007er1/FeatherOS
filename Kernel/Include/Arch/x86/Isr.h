@@ -24,7 +24,7 @@ typedef struct {
 
     // Values we pushed before jumping to isrCommonHandler
     uint64_t isrNumber;
-    uint64_t isrErrorCode;
+    uint64_t isrCode;
 
     // Stuff popped by iretq
     uint64_t rip;
@@ -37,3 +37,4 @@ typedef struct {
 
 
 void generalIsrHandler(cpuStatus_t* cpuStatus);
+void generalIrqHandler(cpuStatus_t* cpuStatus);
