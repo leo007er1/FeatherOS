@@ -1,6 +1,5 @@
 [bits 64]
-[extern generalIsrHandler]
-[extern generalIrqHandler]
+[extern intHandler]
 
 
 %macro pushaq 0
@@ -19,10 +18,26 @@
     push r13
     push r14
     push r15
+    mov rax, cr0
+    push rax
+    mov rax, cr2
+    push rax
+    mov rax, cr3
+    push rax
+    mov rax, cr4
+    push rax
 %endmacro
 
 
 %macro popaq 0
+    pop rax
+    mov cr4, rax
+    pop rax
+    mov cr3, rax
+    pop rax
+    mov cr2, rax
+    pop rax
+    mov cr0, rax
     pop r15
     pop r14
     pop r13
@@ -42,54 +57,47 @@
 
 
 %macro setIsr 1
-    isr%+%1:
+    [global intr%+%1]
+    intr%+%1:
         push 0
         push %1
 
-        jmp isrCommonHandler
+        jmp isrCommonEntry
 %endmacro
 
 %macro setIsrError 1
-    isr%+%1:
+    [global intr%+%1]
+    intr%+%1:
         push %1
 
-        jmp isrCommonHandler
+        jmp isrCommonEntry
 %endmacro
 
 
-%macro setIrq 1
-    irq%+%1:
-        push %1
-        push (32 + %1)
-
-        jmp irqCommonHandler
-%endmacro
-
-
-isrCommonHandler:
+isrCommonEntry:
     pushaq
     cld
 
+    ; mov ax, 0x10
+    ; mov ds, ax
+    ; mov es, ax
+    ; mov fs, ax
+    ; mov gs, ax
+
     mov rdi, rsp ; System V x86-64 uses rdi as the first argument for a function. (rsp is the stack pointer)
-    call generalIsrHandler
-    mov rsp, rax ; And the return value is in rax
+    call intHandler
+    ; mov rsp, rax ; And the return value is in rax
+
+    ; pop rax
+    ; mov ds, ax
+    ; mov es, ax
+    ; mov fs, ax
+    ; mov gs, ax
 
     popaq
     add rsp, 16
     iretq
 
-
-irqCommonHandler:
-    pushaq
-    cld
-
-    mov rdi, rsp ; System V x86-64 uses rdi as the first argument for a function. (rsp is the stack pointer)
-    call generalIrqHandler
-    mov rsp, rax ; And the return value is in rax
-
-    popaq
-    add rsp, 16
-    iretq
 
 
 
@@ -130,23 +138,19 @@ setIsrError 30 ; Security exception
 setIsr 31 ; Reserved
 
 ; IRQs
-setIrq 0 ; PIT
-setIrq 1 ; Keyboard
+%assign i 32
+%rep 224
+    setIsr i
+    %assign i i + 1
+%endrep
 
 
+[section .data]
 
-[global interruptList]
-%assign i 0
-interruptList:
-    ; Exceptions
-    %rep 32
-        dq isr%+i
-        %assign i i + 1
-    %endrep
-
-    ; IRQs
+[global intrList]
+intrList:
     %assign i 0
-    %rep 2
-        dq irq%+i
+    %rep 256
+        dq intr%+i
         %assign i i + 1
     %endrep

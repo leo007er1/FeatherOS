@@ -2,18 +2,15 @@
 #pragma once
 
 #include <Common.h>
+#include <Arch/x86/Pic.h>
+#include <Screen/Terminal.h>
+#include <Screen/Framebuffer.h>
 
 
 // Used to check the values pushed to the stack from the ISR handlers
-typedef struct {
-    uint64_t r15;
-    uint64_t r14;
-    uint64_t r13;
-    uint64_t r12;
-    uint64_t r11;
-    uint64_t r10;
-    uint64_t r9;
-    uint64_t r8;
+typedef __attribute__((packed)) struct {
+    uint64_t cr4, cr3, cr2, cr0;
+    uint64_t r15, r14, r13, r12, r11, r10, r9, r8;
     uint64_t rsi;
     uint64_t rdi;
     uint64_t rbp;
@@ -22,8 +19,8 @@ typedef struct {
     uint64_t rbx;
     uint64_t rax;
 
-    // Values we pushed before jumping to isrCommonHandler
-    uint64_t isrNumber;
+    // Values we pushed in the macros
+    uint64_t isrNum;
     uint64_t isrCode;
 
     // Stuff popped by iretq
@@ -33,8 +30,8 @@ typedef struct {
     uint64_t rsp;
     uint64_t ss;
     
-} __attribute__((packed)) cpuStatus_t;
+} __attribute__((packed)) intFrame_t;
 
 
-void generalIsrHandler(cpuStatus_t* cpuStatus);
-void generalIrqHandler(cpuStatus_t* cpuStatus);
+void __attribute__((noreturn)) intHandler(intFrame_t* intFrame);
+void generalIrqHandler(intFrame_t* intFrame);

@@ -7,7 +7,7 @@ void* memset(void* source, int v, size_t size) {
 
     while (size-- > 0) *start++ = v;
 
-    return bsource;
+    return source;
 }
 
 

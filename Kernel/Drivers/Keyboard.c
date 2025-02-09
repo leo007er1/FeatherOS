@@ -1,6 +1,6 @@
 
 #include <Common.h>
-#include <IO/Keyboard.h>
+#include <Drivers/Keyboard.h>
 #include <Screen/Terminal.h>
 
 // * NOTES
@@ -14,15 +14,10 @@
 
 
 void keyboardIsr() {
-    uint8_t data = inb(ps2Data);
-    log("Scancode!\n");
-    // uint8_t status = inb(ps2Reg);
+    // uint8_t scancode = inb(0x60);
 
-    // if (status & 0x01) {
-    //     uint8_t scancode = inb(ps2Data);
-
-    //     log("Scancode: %c", scancode);
-    // }
+    // log("Scancode: %c", scancode);
+    log("ciao");
 }
 
 
@@ -105,7 +100,7 @@ void keyboardInit() {
     uint8_t currentMask = inb(0x21);
     outb(0x21, currentMask & 0xfd);
 
-    uint8_t garbageData = inb(ps2Data); // Flush output buffer
+    uint8_t garbageData = inb(0x60); // Flush output buffer
 
-    log("%bKeyboard initialized succesfully!", 0x57cc99);
+    log("[ %bOK%b ] Keyboard initialized succesfully!\n", 0x57cc99, 0xffffff);
 }

@@ -83,13 +83,14 @@ run:
 	qemu-system-x86_64 -hda $(BuildDir)$(IsoName) -d int
 
 debug:
-	qemu-system-x86_64 -hda $(BuildDir)$(IsoName) -d int -monitor stdio 
+	qemu-system-x86_64 -hda $(BuildDir)$(IsoName) -d int -monitor stdio -M smm=off
 
 clean:
 	rm -rf $(BuildDir)*
 	mkdir -p $(BuildDir)Kernel/Arch/x86/
 	mkdir -p $(BuildDir)Kernel/Screen/
 	mkdir -p $(BuildDir)Kernel/IO/
+	mkdir -p $(BuildDir)Kernel/Drivers/
 	mkdir -p $(BuildDir)Kernel/Memory/
 	mkdir -p $(BuildDir)Kernel/Utils/
 

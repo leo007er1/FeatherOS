@@ -5,7 +5,7 @@
 #include <Arch/x86/Gdt.h>
 #include <Arch/x86/Idt.h>
 #include <Arch/x86/Acpi.h>
-#include <IO/Keyboard.h>
+#include <Drivers/Keyboard.h>
 #include <Memory/Pmm.h>
 
 extern void sseInit();
@@ -23,19 +23,18 @@ void __attribute__((section(".entry"))) kernelInit(void) {
     log("Time since UNIX time: %d seconds\n\n", (uint64_t)bootTimeRequest.response->boot_time);
 
     gdtInit();
-    log("%bGDT initialized succesfully!\n", 0x57cc99);
     idtInit(); // KABUUMM
-    log("%bIDT initialized succesfully!\n", 0x57cc99);
     acpiInit();
-    log("%bParsed ACPI tables\n", 0x57cc99);
+    log("[ %bOK%b ] Parsed ACPI tables!\n", 0x57cc99, 0xffffff);
     sseInit();
     log("%bMemory size: %dMB\n", 0x57cc99, (uint64_t)(GetMemorySize() / 1048576));
 
     keyboardInit();
     terminalInit();
 
-    // ! Here General Protection Fault is raised
-    //* __asm__ volatile("int $0x21");
+    // float g = 5 / 0;
+
+    __asm__ volatile("int $0x21");
 
     __asm__ volatile("cli");
     for (;;) __asm__ volatile("hlt");

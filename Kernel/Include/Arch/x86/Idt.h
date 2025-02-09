@@ -1,23 +1,25 @@
 #pragma once
 
 #include <Common.h>
-#include <IO/Ports.h>
+#include <Ports.h>
 #include <Arch/x86/Pic.h>
-
-#define idtIntFlags 0x8e
-#define idtTrapFlags 0x8f
+#include <Screen/Terminal.h>
 
 
 typedef struct {
-    uint16_t address0;
-    uint16_t segSelector; // Code segment selector in GDT
-    uint8_t ist; // Bits 0 to 2 hold the Interrupt Stack Table offset, rest is 0
-    uint8_t flags; // Gate type, Reserved, DPL and Present bit
-    uint16_t address1;
-    uint32_t address2;
-    uint32_t zero;
+    uint16_t offset0;
+    uint16_t segSelector;
+    uint8_t ist : 3; // Interrupt Stack Table offset
+    uint8_t reserved0 : 5;
+    uint8_t type : 4;
+    uint8_t zero : 1;
+    uint8_t dpl : 2;
+    uint8_t present : 1;
+    uint16_t offset1;
+    uint32_t offset2;
+    uint32_t reserved1;
 
-} __attribute__((packed)) idtEntry_t;
+} __attribute__((packed)) idtGate_t;
 
 
 typedef struct {
@@ -27,8 +29,12 @@ typedef struct {
 } __attribute__((packed)) idtr_t;
 
 
-#define kernelCs 0x08
-#define idtEntries 256
+#define idtTrapGate 0xf
+#define idtIntGate 0xe 
+#define idtMaxGates 256
 
+extern void setIdt();
+extern void* intrList[];
 
+void idtSetGate(void (*handler)(), uint16_t vector, uint8_t gateType, uint8_t gateDpl);
 void idtInit(void);

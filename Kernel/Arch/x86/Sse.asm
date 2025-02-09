@@ -62,7 +62,7 @@ sseInit:
 
     .noAvx:
         lea rdi, noAvxMessage
-        lea rsi, 0xef233c
+        lea rsi, 0xf27638
         call log
 
         ret

@@ -1,6 +1,6 @@
 
 #include <Common.h>
-#include <IO/Ports.h>
+#include <Ports.h>
 
 
 uint8_t inb(uint16_t port) {
