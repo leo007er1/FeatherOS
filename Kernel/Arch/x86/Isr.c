@@ -38,7 +38,7 @@ static const char* exceptionsNames[] = {
 };
 
 
-void __attribute__((noreturn)) intHandler(intFrame_t* intFrame) {
+void intHandler(intFrame_t* intFrame) {
     __asm__ volatile("cli");
 
     if (intFrame->isrNum <= 31) {

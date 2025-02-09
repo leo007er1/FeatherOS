@@ -6,8 +6,8 @@ A simple x86 64-bit hobby operating system made in C and Assembly.
 
 This project contains my shot at creating a functioning os and since I'm still learning a lot it may contain bad code, bad practices and bugs. I tried to run the os on my computer and a Thinkpad laptop and it worked without causing hassle.
 For now the os does the following:
- - Setup a GDT
- - Setup IDT and handles exceptions
+ - Sets up a GDT
+ - Sets up IDT and handles exceptions and IRQs
  - Barebones ACPI driver.
  - SSE support.
  - Barebones PS/2 keyboard driver.
@@ -25,7 +25,7 @@ sudo make
 ```
 
 ## Running the os
-As a virtual machine I use Qemu with the `qemu-system-x86_64` command, so install that and you're good to go.
+I use Qemu with the `qemu-system-x86_64` command, so install that and you're good to go.
 To run it just type:
 ```sh
 make run

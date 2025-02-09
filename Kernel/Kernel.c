@@ -27,9 +27,9 @@ void __attribute__((section(".entry"))) kernelInit(void) {
     acpiInit();
     log("[ %bOK%b ] Parsed ACPI tables!\n", 0x57cc99, 0xffffff);
     sseInit();
-    log("%bMemory size: %dMB\n", 0x57cc99, (uint64_t)(GetMemorySize() / 1048576));
-
     keyboardInit();
+
+    log("%bMemory size: %dMB\n", 0x57cc99, (uint64_t)(GetMemorySize() / 1048576));
     terminalInit();
 
     // float g = 5 / 0;

@@ -33,5 +33,5 @@ typedef __attribute__((packed)) struct {
 } __attribute__((packed)) intFrame_t;
 
 
-void __attribute__((noreturn)) intHandler(intFrame_t* intFrame);
+void intHandler(intFrame_t* intFrame);
 void generalIrqHandler(intFrame_t* intFrame);
